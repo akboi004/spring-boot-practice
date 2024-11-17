@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +22,13 @@ import jakarta.validation.Valid;
 @RestController
 public class ItemController {
 
-	@Autowired
-	ItemRepo itemRepo;
+	private ItemRepo itemRepo;
 
+	public ItemController(ItemRepo itemRepo) {
+		this.itemRepo = itemRepo;
+	}
+
+	@Cacheable(cacheNames = "itemCache", key = "#id")
 	@GetMapping("/item/{id}")
 	Item getById(@PathVariable Long id) {
 		Optional<Item> optionalItem = itemRepo.findById(id);

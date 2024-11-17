@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +18,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "ITEM_DTLS")
-public class Item {
+public class Item implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4538737638970509472L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
