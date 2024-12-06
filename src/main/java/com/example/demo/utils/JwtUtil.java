@@ -10,7 +10,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtil {
 
 	private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-	private static final long EXPIRATION_TIME = 2 * 60 * 1000;
+	private static final long EXPIRATION_TIME = 1 * 60 * 60 * 1000; //1 hour
 
 	public static String generateToken(String clientId) {
 		return Jwts.builder().setSubject(clientId).setIssuedAt(new Date())

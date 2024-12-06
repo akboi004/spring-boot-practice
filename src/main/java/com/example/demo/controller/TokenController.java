@@ -44,7 +44,7 @@ public class TokenController {
 			Map<String, Object> response = new HashMap<>();
 			response.put("access_token", token);
 			response.put("token_type", "Bearer");
-			response.put("expires_in", 120);
+			response.put("expires_in", "1 Hour");
 
 			return response;
 		} else {
