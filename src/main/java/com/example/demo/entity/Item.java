@@ -2,6 +2,8 @@ package com.example.demo.entity;
 
 import java.io.Serializable;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,12 +20,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "ITEM_DTLS")
-public class Item implements Serializable {
+public class Item extends RepresentationModel<Item> {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 4538737638970509472L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

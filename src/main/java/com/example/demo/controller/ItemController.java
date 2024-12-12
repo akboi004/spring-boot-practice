@@ -1,9 +1,13 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,8 +44,21 @@ public class ItemController {
 	}
 
 	@GetMapping("/getAllItem")
-	List<Item> getAllItem() {
-		return itemRepo.findAll();
+	CollectionModel<EntityModel<Item>> getAllItem() {
+		List<Item> itemLst = itemRepo.findAll();
+		List<EntityModel<Item>> entityModels = new ArrayList<>();
+
+		for (Item item : itemLst) {
+			EntityModel<Item> entityModel = EntityModel.of(item,
+					WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ItemController.class).getById(item.getId()))
+							.withSelfRel(),
+					WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ItemController.class).getAllItem())
+							.withRel("all-items"));
+			entityModels.add(entityModel);
+		}
+
+		return CollectionModel.of(entityModels,
+				WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ItemController.class).getAllItem()).withSelfRel());
 	}
 
 	@PostMapping("/createItem")
