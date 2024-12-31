@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entity.ImageEntity;
+import com.example.demo.serviceImpl.EmailService;
 import com.example.demo.serviceImpl.ImageService;
 
 @RestController
@@ -27,9 +28,11 @@ import com.example.demo.serviceImpl.ImageService;
 public class ImageController {
 
 	private final ImageService imageService;
+	private final EmailService emailService;
 
-	public ImageController(ImageService imageService) {
+	public ImageController(ImageService imageService, EmailService emailService) {
 		this.imageService = imageService;
+		this.emailService = emailService;
 	}
 
 	@PostMapping("/upload")
@@ -46,7 +49,10 @@ public class ImageController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Resource> getImage(@PathVariable Long id) throws Exception {
 		try {
-			ImageEntity image = imageService.getImageMetadata(id); // Get image metadata first
+			// Get image metadata first
+			ImageEntity image = imageService.getImageMetadata(id);
+
+			// Fetch image path
 			Path filePath = Paths.get(image.getData());
 			Resource resource = new FileSystemResource(filePath.toFile());
 
@@ -54,6 +60,10 @@ public class ImageController {
 				throw new IOException("File not found: " + filePath);
 			}
 
+			// Send an email upon API hit
+			sendEmailOnApiHit(id, image); // Trigger email
+
+			// Return the image file as a response
 			return ResponseEntity.ok()
 					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename())
 					.contentType(MediaType.IMAGE_JPEG) // Dynamically set the content type based on image format
@@ -61,6 +71,17 @@ public class ImageController {
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
+	}
+
+	// Method to send email after API call
+	private void sendEmailOnApiHit(Long id, ImageEntity image) {
+		String subject = "API Hit Successful: Image Fetch";
+		String body = String.format(
+				"The image with ID %d was successfully fetched.\n\nImage Details:\nName: %s\nPath: %s", id,
+				image.getName(), image.getData());
+
+		// Send email notification
+		emailService.sendMail("imalwinkurian4@gmail.com", subject, body); // Use the verified sender email
 	}
 
 	@DeleteMapping("/{id}")
